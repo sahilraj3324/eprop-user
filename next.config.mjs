@@ -11,7 +11,7 @@ const nextConfig = {
   // Enable proper handling of external URLs for images
   experimental: {
     serverActions: {
-      allowedOrigins: ['localhost:3000', 'localhost:5000']
+      allowedOrigins: ['*'] // Allow all origins for production flexibility
     }
   }
 };

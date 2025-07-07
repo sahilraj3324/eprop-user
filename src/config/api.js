@@ -1,10 +1,10 @@
 // API Configuration
 const API_CONFIG = {
   // Development URL
-  BASE_URL: 'http://localhost:5000',
+  // BASE_URL: 'http://localhost:5000',
   
   // Production URL (uncomment when deploying)
-  // BASE_URL: 'https://your-production-domain.com',
+  BASE_URL: 'https://eprop.vercel.app',
   
   // API endpoints
   ENDPOINTS: {
