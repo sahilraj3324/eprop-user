@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
 import { FiArrowLeft } from 'react-icons/fi';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
 import ImageUpload from '@/components/ImageUpload';
 
-export default function CreateItem() {
+export default function EditItem() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -27,6 +27,8 @@ export default function CreateItem() {
   });
   const [error, setError] = useState('');
   const router = useRouter();
+  const params = useParams();
+  const itemId = params.id;
 
   useEffect(() => {
     const initializePage = async () => {
@@ -44,6 +46,44 @@ export default function CreateItem() {
 
     initializePage();
   }, [router]);
+
+  useEffect(() => {
+    if (user && itemId) {
+      fetchItem();
+    }
+  }, [user, itemId]);
+
+  const fetchItem = async () => {
+    try {
+      const response = await axios.get(API_URLS.ITEM_BY_ID(itemId), API_DEFAULT_CONFIG);
+      
+      const item = response.data;
+      
+      // Check if the current user owns this item
+      if (item.user._id !== user._id) {
+        setError('You are not authorized to edit this item.');
+        return;
+      }
+
+      // Populate form with existing data
+      setFormData({
+        title: item.title || '',
+        description: item.description || '',
+        price: item.price || '',
+        category: item.category || 'other',
+        condition: item.condition || 'good',
+        brand: item.brand || '',
+        location: item.location || '',
+        city: item.city || '',
+        state: item.state || '',
+        country: item.country || 'India',
+        images: item.images || [],
+      });
+    } catch (error) {
+      console.error('Error fetching item:', error);
+      setError('Failed to load item details.');
+    }
+  };
 
   const categories = [
     { value: 'electronics', label: 'Electronics' },
@@ -110,14 +150,14 @@ export default function CreateItem() {
         user: user._id,
       };
 
-      const response = await axios.post(API_URLS.ITEMS, itemData, API_DEFAULT_CONFIG);
+      const response = await axios.put(API_URLS.ITEM_BY_ID(itemId), itemData, API_DEFAULT_CONFIG);
 
-      if (response.status === 201) {
-        router.push('/items/my-items?message=Item listed successfully!');
+      if (response.status === 200) {
+        router.push('/items/my-items?message=Item updated successfully!');
       }
     } catch (error) {
-      console.error('Error creating item:', error);
-      setError(error.response?.data?.message || 'Failed to create item. Please try again.');
+      console.error('Error updating item:', error);
+      setError(error.response?.data?.message || 'Failed to update item. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -133,6 +173,25 @@ export default function CreateItem() {
 
   if (!user) {
     return null;
+  }
+
+  if (error && !formData.title) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar user={user} />
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+          <button
+            onClick={() => router.push('/items/my-items')}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+          >
+            Back to My Items
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -151,8 +210,8 @@ export default function CreateItem() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">List New Item</h1>
-          <p className="text-gray-600 mt-2">Fill out the details below to list your item</p>
+          <h1 className="text-3xl font-bold text-gray-900">Edit Item</h1>
+          <p className="text-gray-600 mt-2">Update your item details</p>
         </div>
 
         {/* Form */}
@@ -338,7 +397,7 @@ export default function CreateItem() {
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
-                onClick={() => router.back()}
+                onClick={() => router.push('/items/my-items')}
                 className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 Cancel
@@ -348,7 +407,7 @@ export default function CreateItem() {
                 disabled={submitting}
                 className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {submitting ? 'Listing Item...' : 'List Item'}
+                {submitting ? 'Updating Item...' : 'Update Item'}
               </button>
             </div>
           </form>

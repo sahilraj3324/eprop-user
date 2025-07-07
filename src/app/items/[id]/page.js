@@ -7,6 +7,7 @@ import axios from 'axios';
 import Navbar from '@/components/Navbar';
 import { FiMapPin, FiTag, FiUser, FiPhone, FiCalendar, FiArrowLeft } from 'react-icons/fi';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
+import ImageGallery from '@/components/ImageGallery';
 
 export default function ItemDetail() {
   const [user, setUser] = useState(null);
@@ -140,20 +141,11 @@ export default function ItemDetail() {
           {/* Item Images and Details */}
           <div className="lg:col-span-2">
             {/* Image Gallery */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div className="h-96 bg-gray-200">
-                {item.images && item.images.length > 0 ? (
-                  <img
-                    src={item.images[0]}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400">
-                    <FiTag size={64} />
-                  </div>
-                )}
-              </div>
+            <div className="mb-6">
+              <ImageGallery 
+                images={item.images} 
+                title={item.title}
+              />
             </div>
 
             {/* Item Details */}

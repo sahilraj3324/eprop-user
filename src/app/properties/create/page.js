@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
+import ImageUpload from '@/components/ImageUpload';
 
 export default function CreateProperty() {
   const [user, setUser] = useState(null);
@@ -19,7 +20,7 @@ export default function CreateProperty() {
     bedrooms: '',
     bathrooms: '',
     area: '',
-    images: [''],
+    images: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,24 +49,7 @@ export default function CreateProperty() {
     });
   };
 
-  const handleImageChange = (index, value) => {
-    const newImages = [...formData.images];
-    newImages[index] = value;
-    setFormData({
-      ...formData,
-      images: newImages,
-    });
-  };
-
-  const addImageField = () => {
-    setFormData({
-      ...formData,
-      images: [...formData.images, ''],
-    });
-  };
-
-  const removeImageField = (index) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
+  const handleImagesChange = (newImages) => {
     setFormData({
       ...formData,
       images: newImages,
@@ -85,7 +69,7 @@ export default function CreateProperty() {
         bedrooms: parseInt(formData.bedrooms) || 0,
         bathrooms: parseInt(formData.bathrooms) || 0,
         area: parseFloat(formData.area) || 0,
-        images: formData.images.filter(img => img.trim() !== ''),
+        images: formData.images,
       };
 
       const response = await axios.post(API_URLS.PROPERTIES, propertyData, API_DEFAULT_CONFIG);
@@ -287,36 +271,13 @@ export default function CreateProperty() {
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Images (URLs)
-              </label>
-              {formData.images.map((image, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {formData.images.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeImageField(index)}
-                      className="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addImageField}
-                className="mt-2 px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              >
-                Add Another Image
-              </button>
+              <ImageUpload
+                images={formData.images}
+                onChange={handleImagesChange}
+                folder="properties"
+                maxImages={10}
+                disabled={loading}
+              />
             </div>
 
             {/* Submit */}

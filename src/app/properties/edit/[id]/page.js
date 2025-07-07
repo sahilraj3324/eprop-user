@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 import Navbar from '@/components/Navbar';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
+import ImageUpload from '@/components/ImageUpload';
 
 export default function EditProperty() {
   const [user, setUser] = useState(null);
@@ -20,7 +21,7 @@ export default function EditProperty() {
     bedrooms: 1,
     bathrooms: 1,
     size: '',
-    images: ['']
+    images: []
   });
   
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function EditProperty() {
         bedrooms: property.bedrooms || 1,
         bathrooms: property.bathrooms || 1,
         size: property.size || '',
-        images: property.images && property.images.length > 0 ? property.images : ['']
+        images: property.images || []
       });
     } catch (error) {
       console.error('Error fetching property:', error);
@@ -87,27 +88,10 @@ export default function EditProperty() {
     });
   };
 
-  const handleImageChange = (index, value) => {
-    const newImages = [...formData.images];
-    newImages[index] = value;
+  const handleImagesChange = (newImages) => {
     setFormData({
       ...formData,
       images: newImages,
-    });
-  };
-
-  const addImageField = () => {
-    setFormData({
-      ...formData,
-      images: [...formData.images, ''],
-    });
-  };
-
-  const removeImageField = (index) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
-    setFormData({
-      ...formData,
-      images: newImages.length > 0 ? newImages : [''],
     });
   };
 
@@ -136,9 +120,6 @@ export default function EditProperty() {
     }
 
     try {
-      // Filter out empty image URLs
-      const validImages = formData.images.filter(img => img.trim() !== '');
-
       const propertyData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
@@ -148,7 +129,7 @@ export default function EditProperty() {
         bedrooms: Number(formData.bedrooms),
         bathrooms: Number(formData.bathrooms),
         size: formData.size.trim(),
-        images: validImages,
+        images: formData.images,
         user: user._id,
       };
 
@@ -352,38 +333,15 @@ export default function EditProperty() {
               </div>
             </div>
 
-            {/* Image URLs */}
+            {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Images (URLs)
-              </label>
-              {formData.images.map((image, index) => (
-                <div key={index} className="flex gap-2 mb-2">
-                  <input
-                    type="url"
-                    value={image}
-                    onChange={(e) => handleImageChange(index, e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  {formData.images.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeImageField(index)}
-                      className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addImageField}
-                className="mt-2 px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-              >
-                Add Another Image
-              </button>
+              <ImageUpload
+                images={formData.images}
+                onChange={handleImagesChange}
+                folder="properties"
+                maxImages={10}
+                disabled={saving}
+              />
             </div>
 
             {/* Submit Button */}

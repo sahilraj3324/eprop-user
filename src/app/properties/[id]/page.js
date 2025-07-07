@@ -5,12 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { FiMapPin, FiHome, FiPhone, FiArrowLeft, FiSquare, FiDroplet } from 'react-icons/fi';
 import { API_URLS } from '@/config/api';
+import ImageGallery from '@/components/ImageGallery';
 
 export default function PropertyDetails() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const params = useParams();
   const router = useRouter();
 
@@ -85,21 +85,12 @@ export default function PropertyDetails() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            {/* Image */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
-              <div className="relative h-96 bg-gray-200">
-                {property.images && property.images.length > 0 ? (
-                  <img
-                    src={property.images[0]}
-                    alt={property.title}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <FiHome size={64} />
-                  </div>
-                )}
-              </div>
+            {/* Image Gallery */}
+            <div className="mb-6">
+              <ImageGallery 
+                images={property.images} 
+                title={property.title}
+              />
             </div>
 
             {/* Property Details */}
@@ -171,7 +162,7 @@ export default function PropertyDetails() {
                     className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-colors"
                   >
                     <FiPhone />
-                    Call Now
+                    Book Now
                   </a>
                 </div>
               )}
