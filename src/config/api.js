@@ -1,10 +1,10 @@
 // API Configuration
 const API_CONFIG = {
   // Development URL
-  // BASE_URL: 'http://localhost:5000',
+  BASE_URL: 'http://localhost:5000',
   
   // Production URL (uncomment when deploying)
-  BASE_URL: 'https://eprop.vercel.app',
+  // BASE_URL: 'https://eprop.vercel.app',
   
   // API endpoints
   ENDPOINTS: {
@@ -24,6 +24,12 @@ const API_CONFIG = {
     ITEMS_BY_USER: (userId) => `/api/items/user/${userId}`,
     ITEMS_BY_CATEGORY: (category) => `/api/items/category/${category}`,
     ITEM_BY_ID: (id) => `/api/items/${id}`,
+    
+    // Chat endpoints
+    CHAT_CONVERSATIONS: '/api/chat/conversations',
+    CHAT_MESSAGES: '/api/chat/messages',
+    CHAT_CONVERSATION_MESSAGES: (conversationId) => `/api/chat/conversations/${conversationId}/messages`,
+    CHAT_UNREAD_COUNT: '/api/chat/unread-count',
   }
 };
 
@@ -50,6 +56,12 @@ export const API_URLS = {
   ITEMS_BY_USER: (userId) => getApiUrl(API_CONFIG.ENDPOINTS.ITEMS_BY_USER(userId)),
   ITEMS_BY_CATEGORY: (category) => getApiUrl(API_CONFIG.ENDPOINTS.ITEMS_BY_CATEGORY(category)),
   ITEM_BY_ID: (id) => getApiUrl(API_CONFIG.ENDPOINTS.ITEM_BY_ID(id)),
+  
+  // Chat URLs
+  CHAT_CONVERSATIONS: getApiUrl(API_CONFIG.ENDPOINTS.CHAT_CONVERSATIONS),
+  CHAT_MESSAGES: getApiUrl(API_CONFIG.ENDPOINTS.CHAT_MESSAGES),
+  CHAT_CONVERSATION_MESSAGES: (conversationId) => getApiUrl(API_CONFIG.ENDPOINTS.CHAT_CONVERSATION_MESSAGES(conversationId)),
+  CHAT_UNREAD_COUNT: getApiUrl(API_CONFIG.ENDPOINTS.CHAT_UNREAD_COUNT),
 };
 
 // Default axios configuration

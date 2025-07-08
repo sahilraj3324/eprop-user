@@ -8,11 +8,15 @@ import Navbar from '@/components/Navbar';
 import { FiMapPin, FiTag, FiUser, FiPhone, FiCalendar, FiArrowLeft } from 'react-icons/fi';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
 import ImageGallery from '@/components/ImageGallery';
+import ChatButton from '@/components/ChatButton';
+import ChatWindow from '@/components/ChatWindow';
 
 export default function ItemDetail() {
   const [user, setUser] = useState(null);
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [isChatMinimized, setIsChatMinimized] = useState(false);
   const router = useRouter();
   const params = useParams();
 
@@ -90,6 +94,21 @@ export default function ItemDetail() {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  // Chat handlers
+  const handleStartChat = (conversation) => {
+    setActiveConversation(conversation);
+    setIsChatMinimized(false);
+  };
+
+  const handleCloseChat = () => {
+    setActiveConversation(null);
+    setIsChatMinimized(false);
+  };
+
+  const handleToggleMinimize = () => {
+    setIsChatMinimized(!isChatMinimized);
   };
 
   if (loading) {
@@ -245,6 +264,11 @@ export default function ItemDetail() {
 
                   {item.isAvailable && (
                     <div className="space-y-3 pt-4 border-t">
+                      <ChatButton 
+                        item={item}
+                        user={user}
+                        onStartChat={handleStartChat}
+                      />
                       <a
                         href={`tel:${item.user.phoneNumber}`}
                         className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center"
@@ -254,7 +278,7 @@ export default function ItemDetail() {
                       </a>
                       <a
                         href={`sms:${item.user.phoneNumber}?body=Hi, I'm interested in your item: ${item.title}`}
-                        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
+                        className="w-full bg-gray-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-700 transition-colors flex items-center justify-center"
                       >
                         📱 Send SMS
                       </a>
@@ -274,6 +298,17 @@ export default function ItemDetail() {
           </div>
         </div>
       </main>
+      
+      {/* Chat Window */}
+      {activeConversation && (
+        <ChatWindow
+          conversation={activeConversation}
+          user={user}
+          onClose={handleCloseChat}
+          isMinimized={isChatMinimized}
+          onToggleMinimize={handleToggleMinimize}
+        />
+      )}
     </div>
   );
 } 

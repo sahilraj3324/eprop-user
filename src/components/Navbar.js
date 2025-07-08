@@ -1,14 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { FiSearch, FiUser, FiLogOut, FiPlus } from 'react-icons/fi';
+import { FiSearch, FiUser, FiLogOut, FiPlus, FiMessageCircle } from 'react-icons/fi';
+import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
 
 export default function Navbar({ user, onSearch, onFilterChange, searchTerm, filterType }) {
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
+
+  // Fetch unread message count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await axios.get(API_URLS.CHAT_UNREAD_COUNT, API_DEFAULT_CONFIG);
+        if (response.data.success) {
+          setUnreadCount(response.data.unreadCount);
+        }
+      } catch (error) {
+        console.error('Error fetching unread count:', error);
+      }
+    };
+
+    fetchUnreadCount();
+    
+    // Poll for unread count every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000);
+    
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogout = async () => {
     try {
@@ -46,6 +71,15 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
               <Link href="/items" className="text-gray-700 hover:text-blue-600 font-medium">
                 Items
               </Link>
+              <Link href="/conversations" className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1">
+                <FiMessageCircle />
+                <span>Messages</span>
+                {unreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[20px] text-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
             </div>
           </div>
 
@@ -78,6 +112,21 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
             </select>
           </div>
 
+          {/* Messages Button (Mobile) */}
+          <div className="md:hidden mr-2">
+            <Link
+              href="/conversations"
+              className="relative p-2 text-gray-700 hover:text-blue-600"
+            >
+              <FiMessageCircle size={24} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1 min-w-[18px] text-center">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Link>
+          </div>
+
           {/* List Property/Item Buttons */}
           <div className="flex space-x-2 mr-4">
           <Link
@@ -85,14 +134,16 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
               className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1 text-sm"
           >
             <FiPlus />
-            List Property
+            <span className="hidden sm:inline">List Property</span>
+            <span className="sm:hidden">Property</span>
           </Link>
             <Link
               href="/items/create"
               className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 flex items-center gap-1 text-sm"
             >
               <FiPlus />
-              List Item
+              <span className="hidden sm:inline">List Item</span>
+              <span className="sm:hidden">Item</span>
             </Link>
           </div>
 
@@ -140,6 +191,21 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
                   onClick={() => setShowUserMenu(false)}
                 >
                   My Items
+                </Link>
+                <Link
+                  href="/conversations"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center justify-between"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <div className="flex items-center gap-2">
+                    <FiMessageCircle />
+                    Messages
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] text-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
                 <button
                   onClick={handleLogout}
