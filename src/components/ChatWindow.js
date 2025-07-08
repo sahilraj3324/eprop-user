@@ -21,6 +21,8 @@ export default function ChatWindow({
   const [connected, setConnected] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const [pollingInterval, setPollingInterval] = useState(null);
+  const lastMessageCountRef = useRef(0);
 
   // Get the other participant (buyer or seller)
   const otherParticipant = conversation.sellerId._id === user._id 
@@ -131,8 +133,55 @@ export default function ChatWindow({
       if (isComponentMounted) {
         const actualStatus = socketService.refreshConnectionStatus();
         setConnected(actualStatus);
+        
+        // Start polling if not connected (production fallback)
+        if (!actualStatus && !pollingInterval) {
+          console.log('Socket not connected, starting message polling');
+          startMessagePolling();
+        } else if (actualStatus && pollingInterval) {
+          console.log('Socket connected, stopping message polling');
+          stopMessagePolling();
+        }
       }
     }, 2000);
+
+    // Message polling for production (when Socket.IO is not available)
+    const startMessagePolling = () => {
+      if (pollingInterval) return; // Already polling
+      
+      const interval = setInterval(async () => {
+        try {
+          if (!isComponentMounted) return;
+          
+          const response = await axios.get(
+            API_URLS.CHAT_CONVERSATION_MESSAGES(conversation._id),
+            API_DEFAULT_CONFIG
+          );
+          
+          if (response.data.success) {
+            const newMessages = response.data.messages;
+            
+            // Only update if we have new messages
+            if (newMessages.length !== lastMessageCountRef.current) {
+              console.log('Polling found new messages:', newMessages.length);
+              setMessages(newMessages);
+              lastMessageCountRef.current = newMessages.length;
+            }
+          }
+        } catch (error) {
+          console.error('Error polling messages:', error);
+        }
+      }, 3000); // Poll every 3 seconds
+      
+      setPollingInterval(interval);
+    };
+
+    const stopMessagePolling = () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+        setPollingInterval(null);
+      }
+    };
 
     // Initialize chat
     initializeChat();
@@ -143,6 +192,7 @@ export default function ChatWindow({
       unsubscribeTyping();
       unsubscribeConnection();
       clearInterval(connectionCheckInterval);
+      stopMessagePolling(); // Clean up polling
       socketService.leaveConversation();
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
@@ -170,46 +220,46 @@ export default function ChatWindow({
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !connected) return;
+    if (!newMessage.trim()) return;
 
     const messageText = newMessage.trim();
     setNewMessage('');
 
     try {
-      // Send via socket for real-time delivery (socket handler will save to DB)
-      socketService.sendMessage(
-        conversation._id,
-        messageText,
-        user._id,
-        user.name
-      );
-
-    } catch (error) {
-      console.error('Error sending message:', error);
-      // Re-add message to input if failed
-      setNewMessage(messageText);
-      
-      // Fallback to API if socket fails
-      try {
+      if (connected) {
+        // Send via socket for real-time delivery (socket handler will save to DB)
+        socketService.sendMessage(
+          conversation._id,
+          messageText,
+          user._id,
+          user.name
+        );
+      } else {
+        // No socket connection (production), use API directly
+        console.log('No socket connection, sending via API');
+        
         await axios.post(API_URLS.CHAT_MESSAGES, {
           conversationId: conversation._id,
           message: messageText
         }, API_DEFAULT_CONFIG);
         
-        // Manually add message to local state as fallback
-        const fallbackMessage = {
-          _id: Date.now(),
+        // Manually add message to local state for immediate feedback
+        const newMessageObj = {
+          _id: Date.now().toString(),
           message: messageText,
           senderId: { _id: user._id, name: user.name },
           createdAt: new Date(),
           conversationId: conversation._id,
           messageType: 'text'
         };
-        setMessages(prev => [...prev, fallbackMessage]);
-      } catch (apiError) {
-        console.error('API fallback also failed:', apiError);
-        setNewMessage(messageText); // Restore message text
+        
+        setMessages(prev => [...prev, newMessageObj]);
+        lastMessageCountRef.current = lastMessageCountRef.current + 1;
       }
+
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setNewMessage(messageText); // Restore message text
     }
   };
 
@@ -247,10 +297,10 @@ export default function ChatWindow({
             <FiUser className="text-sm" />
             <span className="font-medium text-sm">{otherParticipant.name}</span>
             {!connected && (
-              <span className="w-2 h-2 bg-red-400 rounded-full" title="Disconnected"></span>
+              <span className="w-2 h-2 bg-orange-400 rounded-full" title="Using HTTP polling"></span>
             )}
             {connected && (
-              <span className="w-2 h-2 bg-green-300 rounded-full" title="Connected"></span>
+              <span className="w-2 h-2 bg-green-300 rounded-full" title="Real-time connected"></span>
             )}
           </div>
           <div className="flex items-center space-x-2">
@@ -286,10 +336,10 @@ export default function ChatWindow({
             <p className="text-xs text-green-100">{conversation.itemId.title}</p>
           </div>
           {!connected && (
-            <span className="w-2 h-2 bg-red-400 rounded-full" title="Disconnected"></span>
+            <span className="w-2 h-2 bg-orange-400 rounded-full" title="Using HTTP polling"></span>
           )}
           {connected && (
-            <span className="w-2 h-2 bg-green-300 rounded-full" title="Connected"></span>
+            <span className="w-2 h-2 bg-green-300 rounded-full" title="Real-time connected"></span>
           )}
         </div>
         <div className="flex items-center space-x-2">
@@ -363,16 +413,13 @@ export default function ChatWindow({
             type="text"
             value={newMessage}
             onChange={handleTyping}
-            placeholder={connected ? "Type a message..." : "Connecting..."}
-            disabled={!connected}
-            className={`flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              !connected ? 'bg-gray-100 text-gray-500' : ''
-            }`}
+            placeholder={connected ? "Type a message..." : "Type a message (via HTTP)..."}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             maxLength={1000}
           />
           <button
             type="submit"
-            disabled={!newMessage.trim() || !connected}
+            disabled={!newMessage.trim()}
             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FiSend size={16} />
