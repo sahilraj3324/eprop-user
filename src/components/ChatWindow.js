@@ -269,7 +269,7 @@ export default function ChatWindow({
           </div>
         </div>
         <div className="p-3 text-sm text-gray-600">
-          Chat with {otherParticipant.name} about "{conversation.itemId.title}"
+          Chat with {otherParticipant.name} about &quot;{conversation.itemId.title}&quot;
         </div>
       </div>
     );

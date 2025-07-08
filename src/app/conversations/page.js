@@ -129,7 +129,7 @@ export default function ConversationsPage() {
             <FiInbox className="mx-auto text-gray-400 mb-4" size={64} />
             <h3 className="text-xl font-medium text-gray-900 mb-2">No conversations yet</h3>
             <p className="text-gray-600 mb-6">
-              Start chatting with sellers by visiting item pages and clicking "Chat with Seller"
+              Start chatting with sellers by visiting item pages and clicking &quot;Chat with Seller&quot;
             </p>
             <button
               onClick={() => router.push('/items')}

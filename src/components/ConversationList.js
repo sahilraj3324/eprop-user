@@ -156,7 +156,7 @@ export default function ConversationList({
               {conversation.lastMessage && (
                 <div className="mb-3">
                   <p className={`text-sm truncate ${hasUnread ? 'font-medium text-gray-900' : 'text-gray-600'}`}>
-                    "{conversation.lastMessage}"
+                    &quot;{conversation.lastMessage}&quot;
                   </p>
                 </div>
               )}
