@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { FiSearch, FiUser, FiLogOut, FiPlus, FiMessageCircle } from 'react-icons/fi';
+import { FiSearch, FiUser, FiLogOut, FiPlus, FiMessageCircle, FiBook } from 'react-icons/fi';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
 
 export default function Navbar({ user, onSearch, onFilterChange, searchTerm, filterType }) {
@@ -71,6 +71,10 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
               <Link href="/items" className="text-gray-700 hover:text-blue-600 font-medium">
                 Items
               </Link>
+              <Link href="/blogs" className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1">
+                <FiBook />
+                <span>Blog</span>
+              </Link>
               <Link href="/conversations" className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1">
                 <FiMessageCircle />
                 <span>Messages</span>
@@ -112,11 +116,19 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
             </select>
           </div>
 
-          {/* Messages Button (Mobile) */}
-          <div className="md:hidden mr-2">
+          {/* Mobile Navigation Buttons */}
+          <div className="md:hidden flex items-center gap-2 mr-2">
+            <Link
+              href="/blogs"
+              className="p-2 text-gray-700 hover:text-blue-600"
+              title="Blog"
+            >
+              <FiBook size={24} />
+            </Link>
             <Link
               href="/conversations"
               className="relative p-2 text-gray-700 hover:text-blue-600"
+              title="Messages"
             >
               <FiMessageCircle size={24} />
               {unreadCount > 0 && (

@@ -1,5 +1,6 @@
 import "./globals.css";
 import Footer from "@/components/Footer";
+import ClientLayout from "@/components/ClientLayout";
 
 export const metadata = {
   title: "Property Portal",
@@ -12,7 +13,9 @@ export default function RootLayout({ children }) {
       <body className="antialiased">
         <div className="min-h-screen flex flex-col">
           <main className="flex-grow">
-            {children}
+            <ClientLayout>
+              {children}
+            </ClientLayout>
           </main>
           <Footer />
         </div>
