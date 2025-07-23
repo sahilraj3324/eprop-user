@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { FiSearch, FiUser, FiLogOut, FiPlus, FiMessageCircle, FiBook } from 'react-icons/fi';
+import { FiSearch, FiUser, FiLogOut, FiPlus, FiMessageCircle, FiBook, FiHelpCircle, FiUsers } from 'react-icons/fi';
 import { API_URLS, API_DEFAULT_CONFIG } from '@/config/api';
 
 export default function Navbar({ user, onSearch, onFilterChange, searchTerm, filterType }) {
@@ -71,6 +71,10 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
               <Link href="/items" className="text-gray-700 hover:text-blue-600 font-medium">
                 Items
               </Link>
+              <Link href="/community" className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1">
+                <FiUsers />
+                <span>Community</span>
+              </Link>
               <Link href="/blogs" className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1">
                 <FiBook />
                 <span>Blog</span>
@@ -83,6 +87,10 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
+              </Link>
+              <Link href="/support" className="text-gray-700 hover:text-blue-600 font-medium flex items-center space-x-1">
+                <FiHelpCircle />
+                <span>Support</span>
               </Link>
             </div>
           </div>
@@ -119,6 +127,13 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
           {/* Mobile Navigation Buttons */}
           <div className="md:hidden flex items-center gap-2 mr-2">
             <Link
+              href="/community"
+              className="p-2 text-gray-700 hover:text-blue-600"
+              title="Community"
+            >
+              <FiUsers size={24} />
+            </Link>
+            <Link
               href="/blogs"
               className="p-2 text-gray-700 hover:text-blue-600"
               title="Blog"
@@ -136,6 +151,13 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
+            </Link>
+            <Link
+              href="/support"
+              className="p-2 text-gray-700 hover:text-blue-600"
+              title="Support"
+            >
+              <FiHelpCircle size={24} />
             </Link>
           </div>
 
@@ -218,6 +240,22 @@ export default function Navbar({ user, onSearch, onFilterChange, searchTerm, fil
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
+                </Link>
+                <Link
+                  href="/community"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <FiUsers />
+                  Community Q&A
+                </Link>
+                <Link
+                  href="/support"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <FiHelpCircle />
+                  Support
                 </Link>
                 <button
                   onClick={handleLogout}

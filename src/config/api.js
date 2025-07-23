@@ -19,6 +19,20 @@ const API_CONFIG = {
     PROPERTIES_BY_USER: (userId) => `/api/properties/user/${userId}`,
     PROPERTY_BY_ID: (id) => `/api/properties/${id}`,
     
+    // Residential Property endpoints
+    RESIDENTIAL_PROPERTIES: '/api/residential-properties',
+    RESIDENTIAL_PROPERTIES_BY_USER: (userId) => `/api/residential-properties/user/${userId}`,
+    RESIDENTIAL_PROPERTY_BY_ID: (id) => `/api/residential-properties/${id}`,
+    RESIDENTIAL_PROPERTY_UPDATE: (id, userId) => `/api/residential-properties/${id}/user/${userId}`,
+    RESIDENTIAL_PROPERTY_DELETE: (id, userId) => `/api/residential-properties/${id}/user/${userId}`,
+    
+    // Commercial Property endpoints
+    COMMERCIAL_PROPERTIES: '/api/commercial-properties',
+    COMMERCIAL_PROPERTIES_BY_USER: (userId) => `/api/commercial-properties/user/${userId}`,
+    COMMERCIAL_PROPERTY_BY_ID: (id) => `/api/commercial-properties/${id}`,
+    COMMERCIAL_PROPERTY_UPDATE: (id, userId) => `/api/commercial-properties/${id}/user/${userId}`,
+    COMMERCIAL_PROPERTY_DELETE: (id, userId) => `/api/commercial-properties/${id}/user/${userId}`,
+    
     // Item endpoints
     ITEMS: '/api/items',
     ITEMS_BY_USER: (userId) => `/api/items/user/${userId}`,
@@ -50,6 +64,20 @@ export const API_URLS = {
   PROPERTIES: getApiUrl(API_CONFIG.ENDPOINTS.PROPERTIES),
   PROPERTIES_BY_USER: (userId) => getApiUrl(API_CONFIG.ENDPOINTS.PROPERTIES_BY_USER(userId)),
   PROPERTY_BY_ID: (id) => getApiUrl(API_CONFIG.ENDPOINTS.PROPERTY_BY_ID(id)),
+  
+  // Residential Property URLs
+  RESIDENTIAL_PROPERTIES: getApiUrl(API_CONFIG.ENDPOINTS.RESIDENTIAL_PROPERTIES),
+  RESIDENTIAL_PROPERTIES_BY_USER: (userId) => getApiUrl(API_CONFIG.ENDPOINTS.RESIDENTIAL_PROPERTIES_BY_USER(userId)),
+  RESIDENTIAL_PROPERTY_BY_ID: (id) => getApiUrl(API_CONFIG.ENDPOINTS.RESIDENTIAL_PROPERTY_BY_ID(id)),
+  RESIDENTIAL_PROPERTY_UPDATE: (id, userId) => getApiUrl(API_CONFIG.ENDPOINTS.RESIDENTIAL_PROPERTY_UPDATE(id, userId)),
+  RESIDENTIAL_PROPERTY_DELETE: (id, userId) => getApiUrl(API_CONFIG.ENDPOINTS.RESIDENTIAL_PROPERTY_DELETE(id, userId)),
+  
+  // Commercial Property URLs
+  COMMERCIAL_PROPERTIES: getApiUrl(API_CONFIG.ENDPOINTS.COMMERCIAL_PROPERTIES),
+  COMMERCIAL_PROPERTIES_BY_USER: (userId) => getApiUrl(API_CONFIG.ENDPOINTS.COMMERCIAL_PROPERTIES_BY_USER(userId)),
+  COMMERCIAL_PROPERTY_BY_ID: (id) => getApiUrl(API_CONFIG.ENDPOINTS.COMMERCIAL_PROPERTY_BY_ID(id)),
+  COMMERCIAL_PROPERTY_UPDATE: (id, userId) => getApiUrl(API_CONFIG.ENDPOINTS.COMMERCIAL_PROPERTY_UPDATE(id, userId)),
+  COMMERCIAL_PROPERTY_DELETE: (id, userId) => getApiUrl(API_CONFIG.ENDPOINTS.COMMERCIAL_PROPERTY_DELETE(id, userId)),
   
   // Item URLs
   ITEMS: getApiUrl(API_CONFIG.ENDPOINTS.ITEMS),

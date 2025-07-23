@@ -11,6 +11,7 @@ export default function SignUp() {
     name: '',
     phoneNumber: '',
     address: '',
+    user_type: 'buyer',
     password: '',
     confirmPassword: '',
     profilePic: '',
@@ -55,8 +56,11 @@ export default function SignUp() {
         name: formData.name.trim(),
         phoneNumber: formData.phoneNumber.trim(),
         address: formData.address.trim(),
+        user_type: formData.user_type,
         password: formData.password,
         profilePic: formData.profilePic.trim(),
+        is_verified: false,
+        is_aadhar_verified: false,
       }, API_DEFAULT_CONFIG);
 
       if (response.status === 201) {
@@ -79,9 +83,12 @@ export default function SignUp() {
             Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
+            Join our platform to buy, sell, or rent properties
+          </p>
+          <p className="mt-1 text-center text-sm text-gray-600">
+            Already have an account?{' '}
             <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
-              sign in to your existing account
+              Sign in here
             </Link>
           </p>
         </div>
@@ -111,7 +118,7 @@ export default function SignUp() {
 
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
-                Phone Number
+                Phone Number *
               </label>
               <input
                 id="phoneNumber"
@@ -128,8 +135,29 @@ export default function SignUp() {
             </div>
 
             <div>
+              <label htmlFor="user_type" className="block text-sm font-medium text-gray-700">
+                Account Type *
+              </label>
+              <select
+                id="user_type"
+                name="user_type"
+                required
+                value={formData.user_type}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+              >
+                <option value="buyer">🏠 Property Buyer</option>
+                <option value="seller">🏢 Property Seller/Owner</option>
+                <option value="agent">👤 Real Estate Agent</option>
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Choose your primary role on the platform
+              </p>
+            </div>
+
+            <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                Address
+                Address (Optional)
               </label>
               <textarea
                 id="address"
@@ -138,7 +166,7 @@ export default function SignUp() {
                 onChange={handleChange}
                 rows={3}
                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your address"
+                placeholder="Enter your address (optional)"
               />
             </div>
 
@@ -199,6 +227,21 @@ export default function SignUp() {
             >
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
+          </div>
+
+          <div className="mt-4 p-4 bg-blue-50 rounded-md">
+            <div className="text-sm text-blue-800">
+              <h4 className="font-medium mb-2">📋 Account Verification</h4>
+              <p className="text-xs text-blue-700 mb-1">
+                • Your account will be created but not verified initially
+              </p>
+              <p className="text-xs text-blue-700 mb-1">
+                • Phone verification can be completed after signup
+              </p>
+              <p className="text-xs text-blue-700">
+                • Aadhar verification is optional for enhanced security
+              </p>
+            </div>
           </div>
         </form>
       </div>
